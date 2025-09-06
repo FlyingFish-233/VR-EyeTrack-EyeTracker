@@ -23,7 +23,7 @@ def crop_to_aspect_ratio(image, width=640, height=480):
     
 # Apply thresholding to an image
 def apply_binary_threshold(image, darkestPixelValue, addedThreshold):
-    threshold = darkestPixelValue + addedThreshold
+    threshold = min(255, int(darkestPixelValue) + int(addedThreshold))
     _, thresholded_image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
     return thresholded_image
 
@@ -48,9 +48,8 @@ def get_darkest_area(image):
                 for dx in range(0, searchArea, internalSkipSize):
                     if x + dx >= gray.shape[1]:
                         break
-                    current_sum += gray[y + dy][x + dx]
+                    current_sum += int(gray[y + dy][x + dx])
                     num_pixels += 1
-
             if current_sum < min_sum and num_pixels > 0:
                 min_sum = current_sum
                 darkest_point = (x + searchArea // 2, y + searchArea // 2)
@@ -147,7 +146,7 @@ def process_frame(frame):
 
 # Process video frames for pupil detection using OpenCV
 def process_video_with_opencv():
-    cap = cv2.VideoCapture(0)  # Open USB camera (adjust index if needed)
+    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW) # Open USB camera (adjust index if needed)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
